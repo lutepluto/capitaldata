@@ -1,6 +1,7 @@
 import scrapy
 
 from capitaldata.items import InstitutionItem
+from capitaldata.items import MyItem
 
 class InstitutionSpider(scrapy.Spider):
 	name = "institution"
@@ -24,4 +25,16 @@ class InstitutionSpider(scrapy.Spider):
 			item['phases'] = sel.xpath('div[@class="media-body"]/ul/li[2]//a/text()').extract()
 			item['fields'] = sel.xpath('div[@class="media-body"]/ul/li[3]//a/text()').extract()
 			item['description'] = sel.xpath('div[@class="media-body"]/ul/li[4]/em/text()').extract()
+			yield item
+
+class ItemSpider(scrapy.Spider):
+
+	name = "item"
+	allowed_domains = ["itjuzi.com"]
+	start_urls = ["http://itjuzi.com/investfirm/1352"]
+
+	def parse(self, response):
+		for sel in response.xpath('//div[contains(@class, "person-info")]/div[@class="media"]'):
+			item = MyItem()
+			item['avatar'] = sel.xpath('a/img/@src').extract()
 			yield item

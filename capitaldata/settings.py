@@ -14,8 +14,11 @@ SPIDER_MODULES = ['capitaldata.spiders']
 NEWSPIDER_MODULE = 'capitaldata.spiders'
 
 ITEM_PIPELINES = {
-	'capitaldata.pipelines.JsonWriterPipeline': 800,
+	'capitaldata.pipelines.MyImagesPipeline': 1,
+	'capitaldata.pipelines.JsonWriterPipeline': 800
 }
+
+IMAGES_STORE = 'avatars/'
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'capitaldata (+http://www.yourdomain.com)'
