@@ -1,6 +1,6 @@
 import scrapy
 
-from capitaldata.institution import InstitutionItem
+from capitaldata.items import InstitutionItem
 
 class InstitutionSpider(scrapy.Spider):
 	name = "institution"
@@ -23,4 +23,5 @@ class InstitutionSpider(scrapy.Spider):
 			item['website'] = sel.xpath('div[@class="media-body"]/ul/li[1]/a/@href').extract()
 			item['phases'] = sel.xpath('div[@class="media-body"]/ul/li[2]//a/text()').extract()
 			item['fields'] = sel.xpath('div[@class="media-body"]/ul/li[3]//a/text()').extract()
+			item['description'] = sel.xpath('div[@class="media-body"]/ul/li[4]/em/text()').extract()
 			yield item
