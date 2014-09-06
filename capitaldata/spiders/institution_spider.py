@@ -1,6 +1,8 @@
 import scrapy
 
 from capitaldata.items import InstitutionItem
+from capitaldata.items import InvestEventItem
+from capitaldata.items import InvestorItem
 from capitaldata.items import MyItem
 
 class InstitutionSpider(scrapy.Spider):
@@ -13,18 +15,75 @@ class InstitutionSpider(scrapy.Spider):
 		for sel in response.xpath('//div[contains(@class, "investfirm-list")]/div[@class="media"]'):
 			url = sel.xpath('ul[contains(@class, "detail-info")]/li[1]/a/@href').extract()[0]
 			name = sel.xpath('ul[contains(@class, "detail-info")]/li[1]/a/text()').extract()[0]
-			yield scrapy.Request(url, callback=self.parseInstitution, meta={'name':name})
+			yield scrapy.Request(url, callback=self.parseInstitution, meta={'name':name, 'url':url})
 
 	def parseInstitution(self, response):
 		for sel in response.xpath('//div[contains(@class, "person-info")]/div[@class="media"]'):
 			item = InstitutionItem()
+			item['url'] = response.meta['url']
 			item['name'] = response.meta['name']
 			item['avatar'] = sel.xpath('a/img/@src').extract()
-			#item['name'] = sel.xpath('ul[contains(concat(" ", normalize-space(@class), " "), " media-body ")]/li[1]/a/text()').extract()
 			item['website'] = sel.xpath('div[@class="media-body"]/ul/li[1]/a/@href').extract()
 			item['phases'] = sel.xpath('div[@class="media-body"]/ul/li[2]//a/text()').extract()
 			item['fields'] = sel.xpath('div[@class="media-body"]/ul/li[3]//a/text()').extract()
 			item['description'] = sel.xpath('div[@class="media-body"]/ul/li[4]/em/text()').extract()
+			yield item
+
+class InvestEventSpider(scrapy.Spider):
+	name = "investevent"
+	allowed_domains = ['itjuzi.com']
+	start_urls = ["http://itjuzi.com/investfirm?page=%s" % page for page in xrange(1,266)]
+
+	def parse(self, response):
+		for sel in response.xpath('//div[contains(@class, "investfirm-list")]/div[@class="media"]'):
+			url = sel.xpath('ul[contains(@class, "detail-info")]/li[1]/a/@href').extract()[0]
+			name = sel.xpath('ul[contains(@class, "detail-info")]/li[1]/a/text()').extract()[0]
+			yield scrapy.Request(url, callback=self.parseInvestEvent, meta={'name':name, 'url':url})
+
+	def parseInvestEvent(self, response):
+		for sel in response.xpath('//table[@id="company-member-list"]/tbody/tr'):
+			item = InvestEventItem()
+			item['url'] = response.meta['url']
+			item['institution'] = response.meta['name']
+			item['date'] = sel.xpath('td[1]/text()').extract()
+			item['company'] = sel.xpath('td[2]/a/text()').extract()
+			item['phase'] = sel.xpath('td[3]/a/text()').extract()
+			item['total'] = sel.xpath('td[4]/text()').extract()
+			item['field'] = sel.xpath('td[5]/a/text()').extract()
+			item['investors'] = sel.xpath('td[6]//a/text()').extract()
+			yield item
+
+class InvestorSpider(scrapy.Spider):
+	name = "investor"
+	allowed_domains = ['itjuzi.com']
+	start_urls = ["http://itjuzi.com/investor/2"]
+
+	def parse(self, response):
+		for sel in response.xpath('//div[contains(@class, "public-info")]'):
+			item = InvestorItem()
+			item['name'] = response.xpath('p[1]/a/text()').extract()
+			yield item
+		# for sel in response.xpath('//div[contains(@class, "person-list")]/div[@class="media"]/div[@class="media-body"]'):
+		# 	url = sel.xpath('h4[@class="media-heading"]/a/@href').extract()[0]
+		# 	name = sel.xpath('h4[@class="media-heading"]/a/text()').extract()[0]
+		# 	yield scrapy.Request(url, callback=self.parseInvestor, meta={'name':name, 'url':url})
+
+	# def parseInvestor(self, response):
+	# 	for sel in response.xpath('//div[contains(@class, "public-info")]'):
+	# 		item = InvestorItem()
+	# 		item['url'] = response.meta['url']
+	# 		item['name'] = response.meta['name']
+	# 		item['weibo'] = response.xpath('p/a/text()').extract()
+			# item['avatar'] = response.xpath('div[@class="media"]/a/img/@src').extract()
+			# item['institution'] = response.xpath('div[@class="media"]/div[@class="media-body"]/ul/li[1]/a/text()').extract()
+			# item['title'] = response.xpath('div[@class="media"]/div[@class="media-body"]/ul/li[1]/text()').extract()
+			# item['weibo'] = response.xpath('div[@class="media"]/div[@class="media-body"]/ul/li[2]/a/text()').extract()
+			# item['description'] = response.xpath('div[@class="media"]/div[@class="media-body"]/ul/li[3]/em/text()').extract()
+			# item['province'] = response.xpath('../div[2]/ul/li[1]/a/text()').extract()
+			# item['city'] = response.xpath('../div[2]/ul/li[1]/em/text()').extract()
+			# item['jobs'] = response.xpath('../div[2]/ul/li[2]//a/text()').extract()
+			# item['education'] = response.xpath('../div[2]/ul/li[3]//a/text()').extract()
+			# item['fields'] = response.xpath('../div[2]/ul/li[4]//a/text()').extract()
 			yield item
 
 class ItemSpider(scrapy.Spider):
