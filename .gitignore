@@ -55,3 +55,4 @@ docs/_build/
 # Customize
 /avatars
 institutions.json
+.DS_Store
