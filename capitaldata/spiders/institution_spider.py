@@ -56,34 +56,29 @@ class InvestEventSpider(scrapy.Spider):
 class InvestorSpider(scrapy.Spider):
 	name = "investor"
 	allowed_domains = ['itjuzi.com']
-	start_urls = ["http://itjuzi.com/investor/2"]
+	start_urls = ["http://itjuzi.com/investor?page=%s" % page for page in xrange(1, 55)]
 
 	def parse(self, response):
-		for sel in response.xpath('//div[contains(@class, "public-info")]'):
-			item = InvestorItem()
-			item['name'] = response.xpath('p[1]/a/text()').extract()
-			yield item
-		# for sel in response.xpath('//div[contains(@class, "person-list")]/div[@class="media"]/div[@class="media-body"]'):
-		# 	url = sel.xpath('h4[@class="media-heading"]/a/@href').extract()[0]
-		# 	name = sel.xpath('h4[@class="media-heading"]/a/text()').extract()[0]
-		# 	yield scrapy.Request(url, callback=self.parseInvestor, meta={'name':name, 'url':url})
+		for sel in response.xpath('//div[contains(@class, "person-list")]/div[@class="media"]/div[@class="media-body"]'):
+			url = sel.xpath('h4[@class="media-heading"]/a/@href').extract()[0]
+			name = sel.xpath('h4[@class="media-heading"]/a/text()').extract()[0]
+			yield scrapy.Request(url, callback=self.parseInvestor, meta={'name':name, 'url':url})
 
-	# def parseInvestor(self, response):
-	# 	for sel in response.xpath('//div[contains(@class, "public-info")]'):
-	# 		item = InvestorItem()
-	# 		item['url'] = response.meta['url']
-	# 		item['name'] = response.meta['name']
-	# 		item['weibo'] = response.xpath('p/a/text()').extract()
-			# item['avatar'] = response.xpath('div[@class="media"]/a/img/@src').extract()
-			# item['institution'] = response.xpath('div[@class="media"]/div[@class="media-body"]/ul/li[1]/a/text()').extract()
-			# item['title'] = response.xpath('div[@class="media"]/div[@class="media-body"]/ul/li[1]/text()').extract()
-			# item['weibo'] = response.xpath('div[@class="media"]/div[@class="media-body"]/ul/li[2]/a/text()').extract()
-			# item['description'] = response.xpath('div[@class="media"]/div[@class="media-body"]/ul/li[3]/em/text()').extract()
-			# item['province'] = response.xpath('../div[2]/ul/li[1]/a/text()').extract()
-			# item['city'] = response.xpath('../div[2]/ul/li[1]/em/text()').extract()
-			# item['jobs'] = response.xpath('../div[2]/ul/li[2]//a/text()').extract()
-			# item['education'] = response.xpath('../div[2]/ul/li[3]//a/text()').extract()
-			# item['fields'] = response.xpath('../div[2]/ul/li[4]//a/text()').extract()
+	def parseInvestor(self, response):
+		for sel in response.xpath('//article[@class="two-col-big-left"]'):
+			item = InvestorItem()
+			item['url'] = response.meta['url']
+			item['name'] = response.meta['name']
+			item['avatar'] = sel.xpath('div[1]/div/a/img/@src').extract()
+			item['institution'] = sel.xpath('div[1]/div/div/ul/li[1]/a/text()').extract()
+			item['title'] = sel.xpath('div[1]/div/div/ul/li[1]/text()').extract()
+			item['weibo'] = sel.xpath('div[1]/div/div/ul/li[2]/a/text()').extract()
+			item['description'] = sel.xpath('div[1]/div/div/ul/li[3]/em/text()').extract()
+			item['province'] = sel.xpath('div[2]/ul/li[1]/a/text()').extract()
+			item['city'] = sel.xpath('div[2]/ul/li[1]/em/text()').extract()
+			item['jobs'] = sel.xpath('div[2]/ul/li[2]//a/text()').extract()
+			item['education'] = sel.xpath('div[2]/ul/li[3]//a/text()').extract()
+			item['fields'] = sel.xpath('div[2]/ul/li[4]//a/text()').extract()
 			yield item
 
 class ItemSpider(scrapy.Spider):

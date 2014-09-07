@@ -14,7 +14,7 @@ SPIDER_MODULES = ['capitaldata.spiders']
 NEWSPIDER_MODULE = 'capitaldata.spiders'
 
 ITEM_PIPELINES = {
-	# 'capitaldata.pipelines.MyImagesPipeline': 1,
+	'capitaldata.pipelines.MyImagesPipeline': 1,
 	'capitaldata.pipelines.JsonWriterPipeline': 800
 }
 
