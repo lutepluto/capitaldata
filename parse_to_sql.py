@@ -21,6 +21,13 @@ with open('investor.json') as data:
 		values = []
 		for key in line.keys():
 			value = line[key]
+			if key in ['title']:
+				value.pop(0)
+				for idx, item in enumerate(value):
+					item = item.strip()
+					if item.endswith(','):
+						item = item[:-2]
+					value[idx] = item
 			if type(value) is list:
 				value = ','.join(value)
 			if key in ['avatar']:
