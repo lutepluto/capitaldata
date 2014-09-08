@@ -3,18 +3,18 @@ import codecs
 import datetime
 from pprint import pprint
 
-with open('institution.json') as data:
-	sql = file('institution.sql', 'w');
-	identifier = 0
+with open('investor.json') as data:
+	sql = file('investor.sql', 'w');
+	index = 0
 	while True:
 
 		line = data.readline()
 		if len(line) == 0:
 			break
-		INSERT_TEMPLATE = 'INSERT INTO institution(`id`'
-		identifier += 1
+		INSERT_TEMPLATE = 'INSERT INTO investor(`id`'
+		index = index + 1
 
-		# if identifier == 900:
+		# if index == 900:
 		# 	break
 
 		line = json.loads(line, "utf-8")
@@ -25,6 +25,8 @@ with open('institution.json') as data:
 				value = ','.join(value)
 			if key in ['avatar']:
 				value = value[(value.rfind('/') + 1):]
+			if key in ['url']:
+				identifier = int(value[(value.rfind('/') + 1):])
 			if key not in ['url', 'images']:
 				values.append(value)
 				INSERT_TEMPLATE += ', `' + key + '`'

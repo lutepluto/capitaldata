@@ -8,7 +8,7 @@ from capitaldata.items import MyItem
 class InstitutionSpider(scrapy.Spider):
 	name = "institution"
 	allowed_domains = ["itjuzi.com"]
-	start_urls = ["http://itjuzi.com/investfirm?page=%s" % page for page in xrange(1,266)]
+	start_urls = ["http://itjuzi.com/investfirm?page=%s" % page for page in xrange(1,268)]
 	# start_urls = ["http://itjuzi.com/investfirm/1352"]
 
 	def parse(self, response):
@@ -32,7 +32,7 @@ class InstitutionSpider(scrapy.Spider):
 class InvestEventSpider(scrapy.Spider):
 	name = "investevent"
 	allowed_domains = ['itjuzi.com']
-	start_urls = ["http://itjuzi.com/investfirm?page=%s" % page for page in xrange(1,266)]
+	start_urls = ["http://itjuzi.com/investfirm?page=%s" % page for page in xrange(1,268)]
 
 	def parse(self, response):
 		for sel in response.xpath('//div[contains(@class, "investfirm-list")]/div[@class="media"]'):
@@ -56,7 +56,7 @@ class InvestEventSpider(scrapy.Spider):
 class InvestorSpider(scrapy.Spider):
 	name = "investor"
 	allowed_domains = ['itjuzi.com']
-	start_urls = ["http://itjuzi.com/investor?page=%s" % page for page in xrange(1, 55)]
+	start_urls = ["http://itjuzi.com/investor?page=%s" % page for page in xrange(1, 56)]
 
 	def parse(self, response):
 		for sel in response.xpath('//div[contains(@class, "person-list")]/div[@class="media"]/div[@class="media-body"]'):
