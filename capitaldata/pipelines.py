@@ -27,7 +27,7 @@ class JsonWriterPipeline(object):
 class CsvExportPipeline(object):
 
 	def __init__(self):
-		self.file = codec.open('institutons.csv', 'w', encoding='utf-8')
+		self.files = {}
 
 	@classmethod
 	def from_crawler(cls, crawler):
@@ -37,12 +37,15 @@ class CsvExportPipeline(object):
 		return pipeline
 
 	def spider_opened(self, spider):
-		self.exporter = CsvItemExporter(self.file)
+		f = open('%s.csv' %  spider.name, 'w');
+		self.files[spider] = f;
+		self.exporter = CsvItemExporter(f, False)
 		self.exporter.start_exporting()
 
 	def spider_closed(self, spider):
 		self.exporter.finish_exporting()
-		self.file.close()
+		f = self.files.pop(spider)
+		f.close()
 
 	def process_item(self, item, spoder):
 		self.exporter.export_item(item)
@@ -55,7 +58,7 @@ class MyImagesPipeline(ImagesPipeline):
 		return 'full/%s' % (name)
 
 	def get_media_requests(self, item, info):
-		yield scrapy.Request(item['avatar'][0])
+		yield scrapy.Request(item['avatar'])
 
 	def item_completed(self, results, item, info):
 		image_paths = [x['path'] for ok, x in results if ok]

@@ -3,7 +3,7 @@ import scrapy
 from capitaldata.items import InstitutionItem
 from capitaldata.items import InvestEventItem
 from capitaldata.items import InvestorItem
-from capitaldata.items import MyItem
+from capitaldata.items import CompanyItem
 
 class InstitutionSpider(scrapy.Spider):
 	name = "institution"
@@ -32,7 +32,7 @@ class InstitutionSpider(scrapy.Spider):
 class InvestEventSpider(scrapy.Spider):
 	name = "investevent"
 	allowed_domains = ['itjuzi.com']
-	start_urls = ["http://itjuzi.com/investfirm?page=%s" % page for page in xrange(1,268)]
+	start_urls = ["http://itjuzi.com/investfirm?page=%s" % page for page in xrange(273, 275)]
 
 	def parse(self, response):
 		for sel in response.xpath('//div[contains(@class, "investfirm-list")]/div[@class="media"]'):
@@ -81,14 +81,31 @@ class InvestorSpider(scrapy.Spider):
 			item['fields'] = sel.xpath('div[2]/ul/li[4]//a/text()').extract()
 			yield item
 
-class ItemSpider(scrapy.Spider):
-
-	name = "item"
-	allowed_domains = ["itjuzi.com"]
-	start_urls = ["http://itjuzi.com/investfirm/1352"]
+class CompanySprider(scrapy.Spider):
+	name = "company"
+	allowed_domains = ['itjuzi.com']
+	start_urls = ['http://itjuzi.com/investfirm?page=%s' % page for page in xrange(273, 275)]
 
 	def parse(self, response):
-		for sel in response.xpath('//div[contains(@class, "person-info")]/div[@class="media"]'):
-			item = MyItem()
-			item['avatar'] = sel.xpath('a/img/@src').extract()
+		for sel in response.xpath('//div[contains(@class, "investfirm-list")]/div[@class="media"]'):
+			url = sel.xpath('ul[contains(@class, "detail-info")]/li[1]/a/@href').extract()[0]
+			name = sel.xpath('ul[contains(@class, "detail-info")]/li[1]/a/text()').extract()[0]
+			yield scrapy.Request(url, callback=self.parseInvestEvent)
+
+	def parseInvestEvent(self, response):
+		for sel in response.xpath('//table[@id="company-member-list"]/tbody/tr'):
+			url = sel.xpath('td[2]/a/@href').extract()[0]
+			name = sel.xpath('td[2]/a/text()').extract()[0]
+			yield scrapy.Request(url, callback=self.parseCompany, meta={'name':name})
+
+	def parseCompany(self, response):
+		for sel in response.xpath('//article[@class="two-col-big-left"]'):
+			item = CompanyItem()
+			item['name'] = response.meta['name']
+			item['avatar'] = sel.xpath('//img[@id="company_big_show"]/@src').extract()[0]
+			item['website'] = sel.xpath('div[2]/ul/li[1]/a/text()').extract()[0]
+			item['establishDate'] = sel.xpath('div[2]/ul/li[3]/em/text()').extract()[0]
+			item['location'] = sel.xpath('div[2]/ul/li[4]/a/text()').extract()[0]
+			item['phase'] = sel.xpath('div[2]/ul/li[6]/a/text()').extract()[0]
+			item['description'] = sel.xpath('div[2]/ul/li[9]/em/text()').extract()[0]
 			yield item

@@ -52,7 +52,15 @@ class InvestorItem(scrapy.Item):
 	education = scrapy.Field()
 	fields = scrapy.Field()
 
-class MyItem(scrapy.Item):
+class CompanyItem(scrapy.Item):
+	avatar = scrapy.Field()
+	name = scrapy.Field()
+	establishDate = scrapy.Field()
+	location = scrapy.Field()
+	website = scrapy.Field()
+	phase = scrapy.Field()
+	description = scrapy.Field()
 
 	images = scrapy.Field()
-	avatar = scrapy.Field(output_processor=TakeFirst);
+
+

@@ -14,8 +14,8 @@ SPIDER_MODULES = ['capitaldata.spiders']
 NEWSPIDER_MODULE = 'capitaldata.spiders'
 
 ITEM_PIPELINES = {
-	'capitaldata.pipelines.MyImagesPipeline': 1,
-	'capitaldata.pipelines.JsonWriterPipeline': 800
+	#'capitaldata.pipelines.MyImagesPipeline': 1,
+	'capitaldata.pipelines.CsvExportPipeline': 800
 }
 
 IMAGES_STORE = 'avatars/'
